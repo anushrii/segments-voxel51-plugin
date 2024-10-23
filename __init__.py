@@ -5,7 +5,7 @@ Operators for integrating with segments.ai
 import enum
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 from urllib.parse import urlparse, urljoin
 
 import fiftyone as fo
@@ -432,7 +432,7 @@ class Point3D:
         return np.array((self.x, self.y, self.z))
 
 
-def pcd_filename_map(dataset: fo.Dataset) -> dict[str, fo.Sample]:
+def pcd_filename_map(dataset: fo.Dataset) -> Dict[str, fo.Sample]:
     if dataset.media_type != "3d":
         return {Path(s.filepath).name: s for s in dataset}
     else:
@@ -448,7 +448,7 @@ def create_uuid_sample_map(
     dataset: fo.Dataset,
     client: segments.SegmentsClient,
     segments_dataset: segments.typing.Dataset,
-) -> dict[str, fo.Sample]:
+) -> Dict[str, fo.Sample]:
     """Creates a dictionary mapping a Segments uuid string to a fiftyone sample."""
     map_ = create_uuid_sample_map_local(dataset)
     reversed_maps = {value.id: key for (key, value) in map_.items()}
@@ -472,7 +472,7 @@ def create_uuid_sample_map(
     return map_
 
 
-def create_uuid_sample_map_local(dataset: fo.Dataset) -> dict[str, fo.Sample]:
+def create_uuid_sample_map_local(dataset: fo.Dataset) -> Dict[str, fo.Sample]:
     """Creates a dictionary mapping a Segments uuid string to a fiftyone sample."""
     map_ = {}
     for sample in dataset:
@@ -495,7 +495,7 @@ def is_cloud_storage(path) -> bool:
 
 
 def insert_segmentation_labels(
-    dataloader: SegmentsDataset, dataset: fo.Dataset, sample_map: dict[str, fo.Sample]
+    dataloader: SegmentsDataset, dataset: fo.Dataset, sample_map: Dict[str, fo.Sample]
 ):
     catmap = {x.id: x.name for x in dataloader.categories}
     dataset.mask_targets["ground_truth_segmentation"] = catmap
@@ -522,7 +522,7 @@ def insert_segmentation_labels(
 
 
 def insert_vector_labels(
-    dataloader: SegmentsDataset, dataset: fo.Dataset, sample_map: dict[str, fo.Sample]
+    dataloader: SegmentsDataset, dataset: fo.Dataset, sample_map: Dict[str, fo.Sample]
 ):
     id_cat_map = {x.id: x.name for x in dataloader.categories}
     for annotation in dataloader:
@@ -582,7 +582,7 @@ def insert_vector_labels(
 def insert_cuboid_labels(
     dataloader: Union[SegmentsDataset, dict],
     dataset: fo.Dataset,
-    sample_map: dict[str, fo.Sample],
+    sample_map: Dict[str, fo.Sample],
 ):
     if isinstance(dataloader, SegmentsDataset):
         id_cat_map = {x.id: x.name for x in dataloader.categories}
